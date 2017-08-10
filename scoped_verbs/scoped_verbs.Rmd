@@ -2,7 +2,7 @@
 title: "scoped verbs"
 author: "JP"
 date: "August 8, 2017"
-output: html_document
+output: github_document
 ---
 
 ```{r}
