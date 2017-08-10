@@ -1,0 +1,83 @@
+quosures
+================
+JP
+July 6, 2017
+
+`enquo()` within a function
+
+``` r
+library(tidyverse)
+```
+
+    ## Loading tidyverse: ggplot2
+    ## Loading tidyverse: tibble
+    ## Loading tidyverse: tidyr
+    ## Loading tidyverse: readr
+    ## Loading tidyverse: purrr
+    ## Loading tidyverse: dplyr
+
+    ## Conflicts with tidy packages ----------------------------------------------
+
+    ## filter(): dplyr, stats
+    ## lag():    dplyr, stats
+
+``` r
+mean_sd <- function(data, var){
+  var <- enquo(var) # enquo() works within custom functions
+  str_c(data %>% pull(!!var) %>% mean(., na.rm = TRUE) %>% myround(2), 
+    "(", data %>% pull(!!var) %>% sd(., na.rm = TRUE) %>% myround(2),")"
+  )
+}
+```
+
+`quo` outside of functions and `quos` with `...` outside of functions.
+
+``` r
+alphatize <- function(data, ...){
+  ... <- enquo(...)
+  temp <- 
+    data %>% 
+    select(!!!...) %>% # note that variables in ... must be pre-quoted using quos() function
+    na.omit() %>% 
+    psych::alpha() 
+  
+  temp$total$raw_alpha %>% broman::myround(2)
+  # Example: 
+  # var_list <- c("disp", "wt", "cyl")
+  # new_alpha <- alphatize(mtcars, var_list)
+  # new_alpha <- alphatize(mtcars, c("disp", "wt", "cyl"))
+}
+
+# Alternative method
+  
+alphatize <- function(data, ...){
+  temp <- 
+    data %>% 
+    select(!!!...) %>% # note that variables in ... must be pre-quoted using quos() function
+    na.omit() %>% 
+    psych::alpha() 
+  
+  temp$total$raw_alpha %>% broman::myround(2)
+  # Example: 
+  # var_list <- quos(disp, wt, cyl)
+  # new_alpha <- alphatize(mtcars, var_list)
+}
+```
+
+`quoname()` and helper `:=`
+
+``` r
+cv_compute <- function(data, cv_name, cv_vector){
+  cv_name <- enquo(cv_name)
+  data %>% 
+      rowwise() %>% 
+      mutate(!!quo_name(cv_name) := mean(c(!!!cv_vector), na.rm = TRUE)) %>% 
+      ungroup()
+}
+
+# with assistance from https://stackoverflow.com/questions/44893169/naming-a-new-variable-based-on-a-quosure/44893334#44893334
+
+# Note in cv_compute code:
+#   You need to use the `:=` helper within `mutate`. 
+#   You'll also need `quo_name` to convert the quoted input to a string.
+```
