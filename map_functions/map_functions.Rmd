@@ -1,0 +1,32 @@
+---
+title: "Map functions"
+author: "JP"
+date: "July 6, 2017"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+# map same formula across several subsets of your databy using `split()` with `map()`
+This will create a list of models. 
+
+```{r}
+mtcars %>%
+  split(.$cyl) %>% 
+  map(~lm(mpg ~ wt * am, data = .))
+```
+
+```{r include=FALSE}
+# data_conf_no_prime %>%
+#   mutate(degree_f = fct_collapse(degree_f,
+#     "PhD" = c("PhD", "EdD"),
+#     "MA" = c("MDorJD", "MA")
+#   )) %>% 
+#   filter(degree_f == c("PhD", "MA")) %>% 
+#   mutate(degree_f = factor(degree_f, levels = c("PhD", "MA"))) %>% 
+#   split(.$degree_f) %>% 
+#   map(~lm(support_cv ~ evid_f * type_f, data = .))
+```
