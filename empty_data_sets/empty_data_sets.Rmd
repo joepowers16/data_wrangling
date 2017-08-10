@@ -1,0 +1,20 @@
+---
+title: "empty_data_sets"
+author: "JP"
+date: "July 9, 2017"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+# empty data frame with default names
+data.frame(matrix(nrow = 10, ncol = 4))
+
+# empty data frame with assigned names
+data.frame(matrix(nrow = 10, ncol = 4)) %>% setNames(., c("dv", "N1", "MN1", "SD1"))  
+```
+
