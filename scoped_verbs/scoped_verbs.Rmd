@@ -1,0 +1,54 @@
+---
+title: "scoped verbs"
+author: "JP"
+date: "August 8, 2017"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+The single table verbs all come in three scoped variants: 
+`_all`, `_at`, & `_if`
+
+`_all()` behaves like a `map()` function.
+```{r}
+summarise_all(mtcars, mean)
+map_dbl(mtcars, mean)
+
+summarise_all(mtcars, funs(mean, sd))
+summarise_all(mtcars, ~mean(.) / sd(.))
+
+# Rows where any value is missing
+filter_all(nycflights13::weather, any_vars(is.na(.)))
+
+# mutate_all would not work in the next line, we must add mutate_if
+nycflights13::weather %>% mutate_if(., is.numeric, ~round(., digits = 2))
+```
+
+`_at()` behaves like `select()` but needs helper options like vars and funs.
+```{r}
+summarise_at(mtcars, vars(mpg, cyl), funs(min, max))
+```
+
+`_if()` adds conditional logic to the aggregation function
+```{r}
+summarise_if(nycflights13::weather,   # the data
+             is.numeric,              # the conditional
+             mean, na.rm = TRUE)      # the function
+
+# combo of _if and _all
+summarise_if(
+    nycflights13::weather,       # the data
+    is.numeric,                  # the logical conditional
+    mean, na.rm = TRUE           # the function
+  ) %>%
+  mutate_all(., ~round(., digits = 2))
+
+mtcars %>% select_if(is.numeric) %>% map_dbl(., var)
+```
+
+
+
+
