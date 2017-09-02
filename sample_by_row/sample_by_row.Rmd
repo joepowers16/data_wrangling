@@ -1,0 +1,39 @@
+---
+title: "sample and average by row"
+author: "JP"
+date: "August 31, 2017"
+output: github_document
+---
+
+```{r load packages}
+library(tidyverse)
+```
+
+```{r creating the dataframe}
+df <- tibble(
+    X1 = rnorm(n = 5, mean = 0, sd = 1),
+    X2 = rnorm(n = 5, mean = 0, sd = 1),
+    X3 = rnorm(n = 5, mean = 0, sd = 1)
+)
+```
+
+Use list columns to concatenate row values and then apply `sample()` and `mean()` functions
+```{r random sample and average}
+df <- df %>% 
+  rowwise() %>% 
+  mutate(
+    X4 = list(c(X1, X2, X3)),
+    X4_rand = list(sample(X4, 2, replace = FALSE)),
+    X4_rand_mean = mean(X4_rand)
+  )
+```
+
+```{r demos}
+df$X4[[1]] 
+df$X4_rand[[1]] 
+df$X4_rand_mean[[1]] 
+
+df$X4[[2]] 
+df$X4_rand[[2]] 
+df$X4_rand_mean[[2]] 
+```
