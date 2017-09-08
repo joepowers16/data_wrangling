@@ -20,6 +20,9 @@ map_dbl(mtcars, mean)
 summarise_all(mtcars, funs(mean, sd))
 summarise_all(mtcars, ~mean(.) / sd(.))
 
+# change all variables to numerics
+mtcars %>% mutate_all(funs(as.numeric))
+
 # Rows where any value is missing
 filter_all(nycflights13::weather, any_vars(is.na(.)))
 
