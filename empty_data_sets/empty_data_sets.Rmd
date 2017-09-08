@@ -9,12 +9,40 @@ output: github_document
 library(tidyverse)
 ```
 
-
-```{r}
+```{r data.frame}
 # empty data frame with default names
-data.frame(matrix(nrow = 10, ncol = 4))
+data.frame(matrix(nrow = 10, ncol = 4)) %>% as.tibble()
 
 # empty data frame with assigned names
-data.frame(matrix(nrow = 10, ncol = 4)) %>% setNames(., c("dv", "N1", "MN1", "SD1"))  
+data.frame(matrix(nrow = 10, ncol = 4)) %>% setNames(., c("dv", "N1", "MN1", "SD1")) %>% as.tibble()
+
+empty <- tibble(
+  temp = 1:10,
+  X1  = NA,
+  X2 = NA
+) %>% 
+  select(-temp)
+
+stocks <- tibble(
+  year   = c(2015, 2015, 2016, 2016),
+  half  = c(   1,    2,     1,    2),
+  return = c(1.88, 0.59, 0.92, 0.17)
+)
+
+tibble(
+  x = 1:5, 
+  y = 1, 
+  z = x ^ 2 + y
+)
+```
+
+"`tribble()` is short for *tr*ansposed tibble. `tribble()` is customised for data entry in code: column headings are defined by formulas (i.e. they start with ~), and entries are separated by commas. This makes it possible to lay out small amounts of data in easy to read form" ([R4DS](http://r4ds.had.co.nz/tibbles.html)).
+```{r}
+mydata <- tribble(
+  ~group_a, ~group_b, ~group_c, ~group_d, 
+  21,       14,       10,       23,
+  24,       20,       12,       35,
+  34,       45,       34,       14
+)
 ```
 
