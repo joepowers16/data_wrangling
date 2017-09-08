@@ -1,0 +1,32 @@
+---
+title: "duplicates"
+author: "JP"
+date: "September 8, 2017"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+If you want to remove duplicated rows from your tibble or dataframe, use `!duplicated()`:
+```{r}
+x <- mtcars
+
+x %>% filter(!duplicated(.))
+```
+
+Remove rows with duplicated values in one or more columns
+```{r}
+x %>% 
+  filter(!duplicated(hp, cyl))
+
+# view rows you just dropped
+x %>% 
+  filter(duplicated(hp, cyl)) %>% 
+  arrange(hp, cyl)
+```
+
+# Resources
+
+[useful link](http://www.sthda.com/english/wiki/identifying-and-removing-duplicate-data-in-r)
