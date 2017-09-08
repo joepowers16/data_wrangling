@@ -1,0 +1,56 @@
+---
+title: "From several columns pull a ranked subset of values by row"
+author: "JP"
+date: "September 6, 2017"
+output: github_document
+---
+
+```{r load packages}
+rm(list = ls())
+
+library(knitr)
+library(tidyverse)
+library(readr)
+
+file_rank_data <- "../data/rank_data.csv"
+```
+
+```{r best soln}
+# Note that some data will have 4 rows per id because of ties in rank. 
+d <- read_csv(file_rank_data) %>% 
+  gather(a1_rating:a6_rating, key = a, value = rating) %>% 
+  group_by(id) %>%
+  mutate(abs_rank = abs(rating - subject_rating) %>% min_rank()) %>%
+  arrange(abs_rank) %>% 
+  slice(1:3) %>% 
+  # filter(abs_rank <= 3) # if you can handle >3 values due to rank ties
+  arrange(desc(id))
+
+d %>% kable()
+```
+
+# optional code to return data to wide format
+```{r}
+d %>% 
+  select(-abs_rank) %>%
+  spread(key = a, value = rating)
+```
+
+# Longer solution using list columns
+```{r}
+ds <- read_csv(file_rank_data) %>% 
+  rowwise() %>% 
+  mutate(
+    rating_list = list(c(a1_rating, a2_rating, a3_rating, a4_rating, 
+      a5_rating, a6_rating)),
+    rating_centered = list(rating_list - subject_rating),
+    rating_centered_ranked = list(min_rank(abs(rating_centered)))
+  ) %>% 
+  ungroup() %>% 
+  unnest() 
+
+ds %>%  
+  group_by(id) %>% 
+  arrange(rating_centered_ranked) %>% 
+  slice(1:3)
+```
