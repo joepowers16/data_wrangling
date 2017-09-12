@@ -1,0 +1,76 @@
+---
+title: "list_columns"
+author: "JP"
+date: "September 3, 2017"
+output: github_document
+---
+
+```{r}
+rm(list = ls())
+
+library(tidyverse)
+library(stringr)
+library(lubridate)
+
+load(url("http://varianceexplained.org/files/trump_tweets_df.rda"))
+
+tb_raw <- trump_tweets_df %>% 
+  dplyr::select(
+    tweet = text, 
+    source = statusSource,
+    created
+   ) 
+
+rm(trump_tweets_df)
+names(tb_raw)
+```
+
+
+```{r}
+source_regex <- "android|iphone"
+tword_regex <- "badly|crazy|weak|spent|strong|dumb|joke|guns|funny|dead"
+
+tb <- tb_raw %>%
+  mutate(
+    source = str_extract(source, source_regex),
+    twords = str_extract_all(string = tweet, pattern = tword_regex) 
+    # str_extract_all() created a list col
+  )
+
+# review contents of list column
+tb %>% filter(twords != "character(0)") %>% pull(twords)
+tb %>% filter(twords == "character(2)") %>% pull(twords)
+
+tb <- tb %>%
+  mutate(
+    n = lengths(twords),
+    hour = hour(created),
+    start = gregexpr(pattern = tword_regex, text = tweet) # created a list col
+  )
+
+summary(tb$start)
+
+tb %>% 
+  filter(twords != "character(0)") %>% 
+  select(tweet, start)
+  pull(start)
+
+```
+
+```{r}
+tb %>%
+  filter(
+    hour < 14,
+    n %>% between(., 1, 2),
+    # tword starts within the first 30 characters.
+    between(map_int(.x = start, .f = min), 0, 30) # created a list col
+  )
+
+summary(tb$start)
+
+# Let’s isolate tweets that contain both the twords “strong” and “weak”.
+tb %>%
+  filter(map_lgl(twords, ~ all(c("strong", "weak") %in% .x)))
+```
+
+
