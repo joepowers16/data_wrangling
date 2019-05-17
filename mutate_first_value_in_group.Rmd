@@ -16,3 +16,26 @@ mtcars %>%
     mutate(mpg = ifelse( seq_along(mpg) == 1, 0, mpg ))
 ```
 
+
+```{r}
+mtcars=mtcars [order(mtcars$cyl, mtcars$mpg),]
+mtcars$mpg[!duplicated(mtcars$cyl)]=0
+```
+
+```{r}
+mtcars %>% 
+  select(cyl, mpg) %>% 
+  group_by(cyl) %>% 
+  slice(1:3) %>% 
+  mutate(mpg = (row_number(mpg) != 1) * mpg)
+```
+
+```{r}
+library(tidyr)
+
+mtcars %>% 
+    group_by(cyl) %>%
+    summarise(mpg = list(c(0, sort(mpg)[-1]))) %>%
+    unnest()
+```
+
